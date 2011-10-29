@@ -35,6 +35,28 @@ module FakeEnumerable
   end
 end
 
+class FakeEnumerator
+  def initialize(data, sym)
+    @data = data
+    @sym = sym
+    @idx = 0
+  end
+
+  def next
+    result = nil
+    i = 0
+    @data.each do |e|
+      result = e and break if i == @idx
+      i += 1
+    end
+
+    # XXX: Wrong, elements may be nil
+    raise StopIteration unless result
+    
+    @idx += 1
+    result
+  end
+end
 
 class SortedList
   include FakeEnumerable
@@ -89,39 +111,39 @@ describe "FakeEnumerable" do
   end
 end
 
-# describe "FakeEnumerator" do
-#   before do
-#     @list = SortedList.new
+describe "FakeEnumerator" do
+  before do
+    @list = SortedList.new
 
-#     @list << 3 << 13 << 42 << 4 << 7
-#   end
+    @list << 3 << 13 << 42 << 4 << 7
+  end
 
-#   it "supports next" do
-#     enum = @list.each
+  it "supports next" do
+    enum = @list.each
 
-#     enum.next.must_equal(3)
-#     enum.next.must_equal(4)
-#     enum.next.must_equal(7)
-#     enum.next.must_equal(13)
-#     enum.next.must_equal(42)
+    enum.next.must_equal(3)
+    enum.next.must_equal(4)
+    enum.next.must_equal(7)
+    enum.next.must_equal(13)
+    enum.next.must_equal(42)
 
-#     assert_raises(StopIteration) { enum.next }
-#   end
+    assert_raises(StopIteration) { enum.next }
+  end
 
-#   it "supports rewind" do
-#     enum = @list.each
+  # it "supports rewind" do
+  #   enum = @list.each
 
-#     4.times { enum.next }
-#     enum.rewind
+  #   4.times { enum.next }
+  #   enum.rewind
 
-#     2.times { enum.next }
-#     enum.next.must_equal(7)
-#   end
+  #   2.times { enum.next }
+  #   enum.next.must_equal(7)
+  # end
 
-#   it "supports with_index" do
-#     enum     = @list.map
-#     expected = ["0. 3", "1. 4", "2. 7", "3. 13", "4. 42"]  
+  # it "supports with_index" do
+  #   enum     = @list.map
+  #   expected = ["0. 3", "1. 4", "2. 7", "3. 13", "4. 42"]  
 
-#     enum.with_index { |e,i| "#{i}. #{e}" }.must_equal(expected)
-#   end
-# end
+  #   enum.with_index { |e,i| "#{i}. #{e}" }.must_equal(expected)
+  # end
+end
