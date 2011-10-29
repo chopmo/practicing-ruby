@@ -39,22 +39,18 @@ class FakeEnumerator
   def initialize(data, sym)
     @data = data
     @sym = sym
-    @idx = 0
+    @idx = -1
   end
 
   def next
-    result = nil
+    @idx += 1
     i = 0
     @data.each do |e|
-      result = e and break if i == @idx
+      return e if i == @idx
       i += 1
     end
 
-    # XXX: Wrong, elements may be nil
-    raise StopIteration unless result
-    
-    @idx += 1
-    result
+    raise StopIteration 
   end
 end
 
