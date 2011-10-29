@@ -20,9 +20,7 @@ module FakeEnumerable
     keys = map(&block)
     data_by_key = {}
     keys.zip(self).each { |k, v| data_by_key[k] = v }
-    result = []
-    keys.sort.each { |k| result << data_by_key[k] }
-    result
+    keys.sort.map { |k| data_by_key[k] }
   end
 
   def reduce(sym_or_acc = nil)
