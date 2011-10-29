@@ -1,8 +1,13 @@
 module FakeEnumerable
+
   def map(&block)
-    result = []
-    each { |e| result << block.call(e) }
-    result
+    if block_given?
+      result = []
+      each { |e| result << block.call(e) }
+      result
+    else
+      FakeEnumerator.new(self, :map)
+    end
   end
 
   def select(&block)
@@ -57,6 +62,13 @@ class FakeEnumerator
     @idx = -1
   end
 
+  def with_index
+    idx = -1
+    @data.send(@sym) do |e|
+      idx += 1
+      yield(e, idx)
+    end
+  end
 end
 
 class SortedList
@@ -80,7 +92,6 @@ class SortedList
       FakeEnumerator.new(self, :each)
     end
   end
-
 end
 
 require "minitest/autorun"
@@ -142,10 +153,10 @@ describe "FakeEnumerator" do
     enum.next.must_equal(7)
   end
 
-  # it "supports with_index" do
-  #   enum     = @list.map
-  #   expected = ["0. 3", "1. 4", "2. 7", "3. 13", "4. 42"]  
+  it "supports with_index" do
+    enum     = @list.map
+    expected = ["0. 3", "1. 4", "2. 7", "3. 13", "4. 42"]  
 
-  #   enum.with_index { |e,i| "#{i}. #{e}" }.must_equal(expected)
-  # end
+    enum.with_index { |e,i| "#{i}. #{e}" }.must_equal(expected)
+  end
 end
