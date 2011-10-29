@@ -52,6 +52,11 @@ class FakeEnumerator
 
     raise StopIteration 
   end
+
+  def rewind
+    @idx = -1
+  end
+
 end
 
 class SortedList
@@ -74,7 +79,8 @@ class SortedList
     else
       FakeEnumerator.new(self, :each)
     end
-  end 
+  end
+
 end
 
 require "minitest/autorun"
@@ -126,15 +132,15 @@ describe "FakeEnumerator" do
     assert_raises(StopIteration) { enum.next }
   end
 
-  # it "supports rewind" do
-  #   enum = @list.each
+  it "supports rewind" do
+    enum = @list.each
 
-  #   4.times { enum.next }
-  #   enum.rewind
+    4.times { enum.next }
+    enum.rewind
 
-  #   2.times { enum.next }
-  #   enum.next.must_equal(7)
-  # end
+    2.times { enum.next }
+    enum.next.must_equal(7)
+  end
 
   # it "supports with_index" do
   #   enum     = @list.map
